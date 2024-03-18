@@ -1,0 +1,33 @@
+originalmente $ cat "/sys/bus/pci/devices/0000:01:00.0/numa_node"
+-1
+
+sudo lshw -numeric -C display (ver el identificador de la grafica)
+pci@0000:01:00.0
+
+root@ASUSergio:/sys/bus/pci/devices# echo 0 | tee -a "/sys/bus/pci/devices/0000:01:00.0/numa_node"
+
+
+Automatizado como:
+$ sudo vim /usr/local/bin/custom-numa-node.sh
+script content:
+	#!/bin/bash
+	echo 0 | sudo tee /sys/bus/pci/devices/0000:01:00.0/numa_node > /dev/null
+
+
+sudo vim /etc/systemd/system/custom-numa-node.service
+service content
+[Unit]
+Description=Set NUMA node to 0 for specific PCI device
+
+[Service]
+ExecStart=/usr/local/bin/custom-numa-node.sh
+Type=oneshot
+User=root
+Group=root
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+
+(ver ficheros)
